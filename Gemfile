@@ -11,6 +11,7 @@ gem 'turbolinks'
 gem 'figaro'
 gem 'bootstrap-sass'
 gem 'devise'
+gem 'pundit'
 
 group :production do
   gem 'pg'

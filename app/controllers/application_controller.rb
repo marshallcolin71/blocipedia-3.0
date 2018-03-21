@@ -1,4 +1,4 @@
 class ApplicationController < ActionController::Base
-  include pundit
+  include Pundit
   protect_from_forgery with: :exception
 end

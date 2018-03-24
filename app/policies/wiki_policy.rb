@@ -23,7 +23,8 @@ class WikiPolicy < ApplicationPolicy
     end
 
     def update?
-      user.present?
+      user.present? && user.admin?
+      user.present? && user == wiki.user
     end
 
     def edit?

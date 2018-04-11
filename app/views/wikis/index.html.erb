@@ -1,15 +1,9 @@
 <h1>My Wikis</h1>
 
-<div class="row">
-  <div class="col-md-8">
-    <% @wikis.each do |wiki| %>
-      <div class="media">
-        <div class="media-body">
-          <h4 class="media-heading">
-            <%= link_to wiki.title, wiki %>
-          </h4>
-        </div>
-      </div>
+<% @wikis.each do |wiki| %>
+  <div class="Well">
+    <h3><%= wiki.title %></h3>
+    <%= link_to "Keep Reading", wiki.title, wiki, class: 'btn btn-default' %>
     <% end %>
   </div>
 

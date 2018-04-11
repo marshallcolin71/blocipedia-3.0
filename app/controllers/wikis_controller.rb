@@ -3,7 +3,7 @@ class WikisController < ApplicationController
   def index
     @user = current_user
     @wikis = Wiki.all
-    authorize @wiki
+    authorize @wikis
   end
 
   def show

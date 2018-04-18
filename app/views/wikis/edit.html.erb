@@ -1,23 +1,36 @@
-<h1>Edit Public Wiki</h1>
+<% if user_is_authorized_to_update? %>
+    <h1>Edit Wiki</h1>
 
-<div class="row">
-  <div class="col-md-4">
-    <p> Guidelines for Wikis </p>
-    <ul>
-      <li>Don't post duplicate content</li>
-      <li>Make sure your wiki contains useful information</li>
-      <li>Please write your wiki in English</li>
-    </ul>
-  </div>
-  <div class="col-md-8">
-    <%= form_for @wiki do |f| %>
-      <%= f.label :title %>
-      <%= f.text_field :title %>
+    <div class="row">
+        <div class="col-md-4">
+            <p>Wiki rules</p>
+            <ul>
+                <li>Write Useful Content</li>
+                <li>Please Don't Post Duplicate Content</li>
+            </ul>
+        </div>
+        <div class="col-md-8">
+            <%= form_for @wiki do |f| %>
+                <div class="form-group">
+                    <%= f.label :title %>
+                    <%= f.text_field :title, class: 'form-control', placeholder: "Enter wiki title" %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :body %>
+                    <%= f.text_area :body, rows: 8, class: 'form-control', placeholder: "Enter wiki body" %>
+                </div>
 
-      <%= f.label :body %>
-      <%= f.text_area :body %>
-
-      <%= f.submit "Save" %>
-    <% end %>
-  </div>
-</div>
+                <% if user_is_authorized_to_create? %>
+                    <div class="form-group">
+                        <%= f.label :private, class: 'checkbox' do %>
+                            <%= f.check_box :private %> Private wiki
+                        <% end %>
+                    </div>
+                <% end %>
+                <div class="form-group">
+                    <%= f.submit "Save", class: 'btn btn-success' %>
+                </div>
+            <% end %>
+        </div>
+    </div>
+<% end %>

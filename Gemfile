@@ -16,7 +16,7 @@ gem 'stripe'
 
 
 group :production do
-  gem 'pg'
+  gem 'pg', '~> 0.20' ##problem pushing to Heroku? Talk to Charlie about this.
   gem 'rails_12factor'
 end
 

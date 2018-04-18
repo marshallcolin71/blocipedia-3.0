@@ -2,12 +2,20 @@ class WikisController < ApplicationController
 
   def index
     @user = current_user
-    @wikis = Wiki.all
+    @wikis = Wiki.visible_to(current_user)
     authorize @wikis
   end
 
   def show
     @wiki = Wiki.find(params[:id])
+    unless (@wiki.private == false) || current_user.premium? || current_user.admin?
+      flash[:alert] = "You must subscribe to a premium membership to view these topics."
+      if current_user
+        redirect_to new_charge_path
+      else
+        redirect_to new_user_registration_path
+      end
+    end
   end
 
   def new

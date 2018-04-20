@@ -16,6 +16,7 @@ class WikiPolicy < ApplicationPolicy
 
     def create?
       user.present?
+      unless (@wiki.private == false) || current_user.premium? || current_user.admin?
     end
 
     def new?
@@ -25,6 +26,7 @@ class WikiPolicy < ApplicationPolicy
     def update?
       user.present? && user.admin?
       user.present? && user == wiki.user
+      unless (@wiki.private == false) || current_user.premium? || current_user.admin?
     end
 
     def edit?

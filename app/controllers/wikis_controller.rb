@@ -2,19 +2,24 @@ class WikisController < ApplicationController
 
   def index
     @user = current_user
-    @wikis = Wiki.visible_to(current_user)
+    @wikis = policy_scope(Wiki)
     authorize @wikis
   end
 
   def show
     @wiki = Wiki.find(params[:id])
-    unless (@wiki.private == false) || (@wiki.private == nil) || current_user.premium? || current_user.admin?
-      flash[:alert] = "You must subscribe to a premium membership to view these topics."
-      if current_user
-        redirect_to new_charge_path
-      else
-        redirect_to new_user_registration_path
+    if current_user.present?
+      collaborators = []
+      @wiki.collaborators.each do |collaborator|
+        collaborators << collaborator.email
       end
+      unless (@wiki.private == false) || @wiki.user == current_user || collaborators.include?(current_user.email) || current_user.admin?
+        flash[:alert] = "You are not authorized to view this wiki"
+        redirect_to new_charge_path
+      end
+    else
+      flash[:alert] = "You are not authorized to view this wiki"
+      redirect_to new_charge_path
     end
   end
 
@@ -29,14 +34,12 @@ class WikisController < ApplicationController
   end
 
   def create
-    @wiki = Wiki.new
-    @wiki.title = params[:wiki][:title]
-    @wiki.body = params[:wiki][:body]
+    @wiki = Wiki.new(wiki_params)
     @wiki.user = current_user
-    @wiki.private = params[:wiki][:private]
     authorize @wiki
 
     if @wiki.save
+      @wiki.collaborators = Collaborator.update_collaborators(params[:wiki][:collaborators])
       flash[:notice] = 'You have successfully created a new wiki.'
       redirect_to @wiki
     else
@@ -47,13 +50,16 @@ class WikisController < ApplicationController
 
   def update
     @wiki = Wiki.find(params[:id])
-    @wiki.title = params[:wiki][:title]
-    @wiki.body = params[:wiki][:body]
-    @wiki.private = params[:wiki][:private]
+    @wiki.assign_attributes(wiki_params)
+    authorize @wiki
 
-    if @wiki.save
-     flash[:notice] = 'You have successfully updated your wiki.'
-     redirect_to @wiki
+    if @wiki.save && (@wiki.user == current_user || current_user == admin?)
+      @wiki.collaborators = Collaborator.update_collaborators(params[:wiki][:collaborators])
+      flash[:notice] = "Wiki was updated successfully"
+      redirect_to @wiki
+    elsif @wiki.save
+      flash[:notice] = "Wiki was updated successfully"
+      redirect_to @wiki
     else
      flash.now[:alert] = 'There was an error updating your wiki. Please try again.'
      render :edit
@@ -80,6 +86,10 @@ class WikisController < ApplicationController
   def user_not_authorized
     flash[:alert] = "You are not authorized to perform this action"
     redirect_to(new_user_session_path)
+  end
+
+  def wiki_params
+    params.require(:wiki).permit(:title, :body, :private)
   end
 
 end

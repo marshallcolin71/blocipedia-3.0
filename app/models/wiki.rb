@@ -1,11 +1,14 @@
 class Wiki < ActiveRecord::Base
   belongs_to :user
-  validates :user, presence: true
+  has_many :collaborators
+  has_many :users, through: :collaborators
 
-  scope :visible_to, -> (user) { user ? all : where(private: false) }
+  after_initialize :initialize_role
 
-  def publicize
-    update_attribute(:private, false)
+  private
+
+  def initialize_role
+    self.private = false if self.private.nil?
   end
   
 end

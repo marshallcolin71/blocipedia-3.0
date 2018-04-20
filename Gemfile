@@ -13,7 +13,7 @@ gem 'bootstrap-sass'
 gem 'devise'
 gem 'pundit'
 gem 'stripe'
-
+gem 'redcarpet'
 
 group :production do
   gem 'pg', '~> 0.20' ##problem pushing to Heroku? Talk to Charlie about this.
